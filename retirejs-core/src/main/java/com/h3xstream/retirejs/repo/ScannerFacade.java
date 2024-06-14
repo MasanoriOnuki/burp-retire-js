@@ -71,12 +71,15 @@ public class ScannerFacade {
                 Pattern p = Pattern.compile(
                     "<script[^>]*" + //script tags
                         "src=" + //src attribute
-                        "[\"']([^>]*)[\"']", //URL between quotes
+                        "(?<src>\"[^\"]*?\"|'[^']*?'|\\S+)", //URL between quotes
                     Pattern.CASE_INSENSITIVE);
 
                 Matcher m = p.matcher(line);
-                if(m.find()) {
-                    String urlScript = m.group(1);
+                if (m.find()) {
+                    String src = m.group("src");
+                    String urlScript = src.startsWith("\"") || src.startsWith("'")
+                        ? src.substring(1, src.length() - 1) // trim quotes
+                        : src;
                     urls.add(urlScript);
                 }
             }
